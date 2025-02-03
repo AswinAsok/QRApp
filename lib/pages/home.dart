@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qrapp/widgets/qr_scanner_corner.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -13,103 +16,7 @@ class Home extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 425,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        margin: EdgeInsets.only(top: 40),
-                        child: Text(
-                          "Scan QR Codes",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Container(
-                            width: 200,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.transparent,
-                                width: 3,
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                _buildCorner(),
-                                Positioned(
-                                  right: 0,
-                                  child: Transform.rotate(
-                                    angle: Math.pi / 2,
-                                    child: _buildCorner(),
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: Transform.rotate(
-                                    angle: Math.pi,
-                                    child: _buildCorner(),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  child: Transform.rotate(
-                                    angle: -Math.pi / 2,
-                                    child: _buildCorner(),
-                                  ),
-                                ),
-                                Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.touch_app,
-                                        color: Colors.black,
-                                        size: 40,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Tap to scan',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Container(
-                          padding: EdgeInsets.all(20),
-                          child: Text(
-                            "Place a QR code inside the frame to scan it",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                ScannerWidget(),
                 Container(
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height - 425,
@@ -165,20 +72,154 @@ class Home extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildCorner() {
+class ScannerWidget extends StatefulWidget {
+  const ScannerWidget({
+    super.key,
+  });
+
+  @override
+  State<ScannerWidget> createState() => _ScannerWidgetState();
+}
+
+class _ScannerWidgetState extends State<ScannerWidget> {
+  bool isScanning = false;
+  String data = "";
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: 30,
-      height: 30,
+      width: double.infinity,
+      height: 425,
       decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border(
-          left: BorderSide(width: 3, color: Colors.black),
-          top: BorderSide(width: 3, color: Colors.black),
-        ),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(10),
-        ),
+        color: Colors.white,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            margin: EdgeInsets.only(top: 40),
+            child: Text(
+              "Scan QR Codes",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.transparent,
+                    width: 3,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    QRScannerCorner(),
+                    Positioned(
+                      right: 0,
+                      child: Transform.rotate(
+                        angle: Math.pi / 2,
+                        child: QRScannerCorner(),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Transform.rotate(
+                        angle: Math.pi,
+                        child: QRScannerCorner(),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      child: Transform.rotate(
+                        angle: -Math.pi / 2,
+                        child: QRScannerCorner(),
+                      ),
+                    ),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isScanning = !isScanning;
+                          });
+                        },
+                        child: isScanning
+                            ? SizedBox(
+                                width: 175,
+                                height: 175,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: MobileScanner(
+                                    onDetect: (capture) {
+                                      final List<Barcode> barcodes =
+                                          capture.barcodes;
+                                      if (barcodes.isNotEmpty) {
+                                        setState(() {
+                                          data = barcodes.first.rawValue ??
+                                              "No data";
+                                          Fluttertoast.showToast(
+                                              msg: "Scanning Complete",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Colors.black,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0);
+                                          isScanning = false;
+                                        });
+                                        // Close the scanner
+                                      }
+                                    },
+                                  ),
+                                ),
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.touch_app,
+                                    color: Colors.black,
+                                    size: 40,
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    isScanning ? 'Scanning...' : 'Tap to scan',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                "Place a QR code inside the frame to scan it",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
