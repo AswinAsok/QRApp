@@ -16,9 +16,8 @@ class MyApp extends StatelessWidget {
           appBarTheme: const AppBarTheme(
             backgroundColor: Colors.white,
             elevation: 0,
-            iconTheme: IconThemeData(color: Colors.black),
+            iconTheme: IconThemeData(color: Colors.white),
           ),
-          scaffoldBackgroundColor: Colors.white,
           fontFamily: 'Satoshi'),
       title: 'QR App',
       home: Home(),
