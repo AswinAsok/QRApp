@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:qrapp/pages/home.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+
+  //open the box
+  var box = await Hive.openBox('qrBox');
+
   runApp(MyApp());
 }
 

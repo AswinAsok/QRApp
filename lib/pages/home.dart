@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qrapp/widgets/qr_scanner_corner.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  Home({super.key});
+
+  //reference our box
+  final _myBox = Hive.box('qrBox');
+
+  void writeData(String data) {
+    _myBox.add(data);
+  }
+
+  void deleteData(int index) {
+    _myBox.deleteAt(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,54 +30,8 @@ class Home extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ScannerWidget(),
-                Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height - 425,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[850],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 20, top: 40),
-                        child: Text(
-                          "Recent Scans",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(
-                                "Scan $index",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              subtitle: Text(
-                                "Date: 2021-10-10",
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                              leading: Icon(Icons.qr_code, color: Colors.white),
-                              trailing: Icon(Icons.arrow_forward_ios,
-                                  color: Colors.white, size: 16),
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                )
+                ScannerWidget(writeData: writeData),
+                RecentScans(deleteData: deleteData)
               ],
             ),
             // You can add more content below the scanner here
@@ -77,8 +43,11 @@ class Home extends StatelessWidget {
 }
 
 class ScannerWidget extends StatefulWidget {
+  final Function(String) writeData;
+
   const ScannerWidget({
     super.key,
+    required this.writeData,
   });
 
   @override
@@ -311,6 +280,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                                               fontSize: 16.0);
                                           isScanning = false;
                                           showInfoModal = true;
+                                          widget.writeData(data);
                                         });
                                         // Close the scanner
                                       }
@@ -356,6 +326,92 @@ class _ScannerWidgetState extends State<ScannerWidget> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class RecentScans extends StatefulWidget {
+  final Function(int) deleteData;
+
+  const RecentScans({
+    super.key,
+    required this.deleteData,
+  });
+
+  @override
+  _RecentScansState createState() => _RecentScansState();
+}
+
+class _RecentScansState extends State<RecentScans> {
+  final _myBox = Hive.box('qrBox');
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height - 425,
+      decoration: BoxDecoration(
+        color: Colors.grey[850],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 20, top: 40),
+            child: Text(
+              "Recent Scans",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: Hive.box('qrBox').listenable(),
+              builder: (context, Box box, _) {
+                if (box.values.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No recent scans",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: box.length,
+                    itemBuilder: (context, index) {
+                      final scan = box.getAt(index);
+                      return ListTile(
+                        title: Text(
+                          scan,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Text(
+                          "Date: ${DateTime.now().toString().split(' ')[0]}",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        leading: Icon(Icons.qr_code, color: Colors.white),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete, color: Colors.white),
+                          onPressed: () {
+                            widget.deleteData(index);
+                          },
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          )
         ],
       ),
     );
