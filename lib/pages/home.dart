@@ -112,10 +112,18 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Icon(
-                        Icons.close,
-                        color: Colors.black,
-                        size: 24,
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showInfoModal = false;
+                            data = "";
+                          });
+                        },
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.black,
+                          size: 24,
+                        ),
                       )
                     ],
                   ),
@@ -138,6 +146,76 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                     ),
                   ),
                   SizedBox(height: 20),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      spacing: 5,
+                      children: [
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black54,
+                          ),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: data));
+                            Fluttertoast.showToast(
+                              msg: "Copied to clipboard",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          },
+                          icon: Icon(Icons.copy, color: Colors.white),
+                          label: Text("Copy",
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                        SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black54,
+                          ),
+                          onPressed: () async {
+                            final Uri uri = Uri.parse(data);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            } else {
+                              Fluttertoast.showToast(
+                                msg: "Could not launch URL",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.black,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                            }
+                          },
+                          icon:
+                              Icon(Icons.open_in_browser, color: Colors.white),
+                          label: Text("Open in Browser",
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                        SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black54,
+                          ),
+                          onPressed: () {
+                            print("Share data");
+                          },
+                          icon: Icon(Icons.share, color: Colors.white),
+                          label: Text("Share",
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
             );
