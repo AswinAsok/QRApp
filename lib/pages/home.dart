@@ -59,137 +59,139 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   bool showInfoModal = false;
   String data = "";
 
-  @override
-  Widget build(BuildContext context) {
-    if (showInfoModal) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showModalBottomSheet(
-          context: context,
-          builder: (BuildContext context) {
-            return Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+  void showModal(String data) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Scan Result',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showInfoModal = false;
-                            data = "";
-                          });
-                        },
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.black,
-                          size: 24,
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        data,
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
+                  Text(
+                    'Scan Result',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 20),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      spacing: 5,
-                      children: [
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.black54,
-                          ),
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: data));
-                            Fluttertoast.showToast(
-                              msg: "Copied to clipboard",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                          },
-                          icon: Icon(Icons.copy, color: Colors.white),
-                          label: Text("Copy",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.black54,
-                          ),
-                          onPressed: () async {
-                            final Uri uri = Uri.parse(data);
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri);
-                            } else {
-                              Fluttertoast.showToast(
-                                msg: "Could not launch URL",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.black,
-                                textColor: Colors.white,
-                                fontSize: 16.0,
-                              );
-                            }
-                          },
-                          icon:
-                              Icon(Icons.open_in_browser, color: Colors.white),
-                          label: Text("Open in Browser",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.black54,
-                          ),
-                          onPressed: () {
-                            print("Share data");
-                          },
-                          icon: Icon(Icons.share, color: Colors.white),
-                          label: Text("Share",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showInfoModal = false;
+                        this.data = "";
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.black,
+                      size: 24,
                     ),
                   )
                 ],
               ),
-            );
-          },
+              SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    data,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black54,
+                      ),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: data));
+                        Fluttertoast.showToast(
+                          msg: "Copied to clipboard",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      },
+                      icon: Icon(Icons.copy, color: Colors.white),
+                      label:
+                          Text("Copy", style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black54,
+                      ),
+                      onPressed: () async {
+                        final Uri uri = Uri.parse(data);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Could not launch URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      },
+                      icon: Icon(Icons.open_in_browser, color: Colors.white),
+                      label: Text("Open in Browser",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black54,
+                      ),
+                      onPressed: () {
+                        print("Share data");
+                      },
+                      icon: Icon(Icons.share, color: Colors.white),
+                      label:
+                          Text("Share", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (showInfoModal) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showModal(data);
       });
     }
 
@@ -347,6 +349,130 @@ class RecentScans extends StatefulWidget {
 class _RecentScansState extends State<RecentScans> {
   final _myBox = Hive.box('qrBox');
 
+  void showModal(String data) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Scan Result',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.black,
+                      size: 24,
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    data,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black54,
+                      ),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: data));
+                        Fluttertoast.showToast(
+                          msg: "Copied to clipboard",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      },
+                      icon: Icon(Icons.copy, color: Colors.white),
+                      label:
+                          Text("Copy", style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black54,
+                      ),
+                      onPressed: () async {
+                        final Uri uri = Uri.parse(data);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Could not launch URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      },
+                      icon: Icon(Icons.open_in_browser, color: Colors.white),
+                      label: Text("Open in Browser",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black54,
+                      ),
+                      onPressed: () {
+                        print("Share data");
+                      },
+                      icon: Icon(Icons.share, color: Colors.white),
+                      label:
+                          Text("Share", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -365,7 +491,7 @@ class _RecentScansState extends State<RecentScans> {
           Container(
             padding: EdgeInsets.only(left: 20, top: 40),
             child: Text(
-              "Recent Scans",
+              "Recent Scans (${_myBox.length})",
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -389,21 +515,26 @@ class _RecentScansState extends State<RecentScans> {
                     itemCount: box.length,
                     itemBuilder: (context, index) {
                       final scan = box.getAt(index);
-                      return ListTile(
-                        title: Text(
-                          scan,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        subtitle: Text(
-                          "Date: ${DateTime.now().toString().split(' ')[0]}",
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        leading: Icon(Icons.qr_code, color: Colors.white),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete, color: Colors.white),
-                          onPressed: () {
-                            widget.deleteData(index);
-                          },
+                      return GestureDetector(
+                        onTap: () {
+                          showModal(scan);
+                        },
+                        child: ListTile(
+                          title: Text(
+                            scan,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            "Date: ${DateTime.now().toString().split(' ')[0]}",
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          leading: Icon(Icons.qr_code, color: Colors.white),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.white),
+                            onPressed: () {
+                              widget.deleteData(index);
+                            },
+                          ),
                         ),
                       );
                     },
