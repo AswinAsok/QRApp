@@ -85,7 +85,9 @@ class ScannerWidget extends StatefulWidget {
 
 class _ScannerWidgetState extends State<ScannerWidget> {
   bool isScanning = false;
+  bool showInfoModal = false;
   String data = "";
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -119,38 +121,38 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                     width: 3,
                   ),
                 ),
-                child: Stack(
-                  children: [
-                    QRScannerCorner(),
-                    Positioned(
-                      right: 0,
-                      child: Transform.rotate(
-                        angle: Math.pi / 2,
-                        child: QRScannerCorner(),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isScanning = !isScanning;
+                    });
+                  },
+                  child: Stack(
+                    children: [
+                      QRScannerCorner(),
+                      Positioned(
+                        right: 0,
+                        child: Transform.rotate(
+                          angle: Math.pi / 2,
+                          child: QRScannerCorner(),
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Transform.rotate(
-                        angle: Math.pi,
-                        child: QRScannerCorner(),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Transform.rotate(
+                          angle: Math.pi,
+                          child: QRScannerCorner(),
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      child: Transform.rotate(
-                        angle: -Math.pi / 2,
-                        child: QRScannerCorner(),
+                      Positioned(
+                        bottom: 0,
+                        child: Transform.rotate(
+                          angle: -Math.pi / 2,
+                          child: QRScannerCorner(),
+                        ),
                       ),
-                    ),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isScanning = !isScanning;
-                          });
-                        },
+                      Center(
                         child: isScanning
                             ? SizedBox(
                                 width: 175,
@@ -174,6 +176,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                                               textColor: Colors.white,
                                               fontSize: 16.0);
                                           isScanning = false;
+                                          showInfoModal = true;
                                         });
                                         // Close the scanner
                                       }
@@ -201,8 +204,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                                 ],
                               ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -218,7 +221,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
